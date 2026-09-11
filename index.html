@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Frog River Phonics (P8): 萌蛙過河單字大冒險 (Focus Sounds: Diphthongs (ai, oi, air, oy) & Body Parts)</title>
+  <meta name="description" content="ALICE ESL Phonics P8 專屬 3D 踏木過河與荷葉跳島美語學習遊戲，涵蓋課本 Page 08 - 13，結合自然發音、單字圖卡與動物動作句型。">
+  
+  <!-- 引入樣式表 (帶版本號避免瀏覽器強烈快取) -->
+  <link rel="stylesheet" href="css/style.css?v=3.0">
+  
+  <!-- 外部依賴函式庫 (Three.js r128, GSAP, Canvas Confetti) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- 遊戲開始偏好設定面板高質感專用樣式 (確保無緩存，即刻呈現頂級排版) -->
+  <style>
+    .start-modal-card {
+      background: rgba(255, 255, 255, 0.98) !important;
+      border: 4px solid #38bdf8 !important;
+      border-radius: 32px !important;
+      max-width: 660px !important;
+      width: 94% !important;
+      max-height: 92vh !important;
+      overflow-y: auto !important;
+      padding: 24px 28px !important;
+      box-shadow: 0 20px 50px rgba(2, 132, 199, 0.25) !important;
+    }
+    .modal-header-section {
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .modal-logo-icon {
+      font-size: 48px;
+      margin-bottom: 4px;
+    }
+    .modal-title {
+      font-size: 26px !important;
+      color: #0369a1 !important;
+      margin-bottom: 4px !important;
+    }
+    .modal-sub {
+      font-size: 14px !important;
+      color: #64748b !important;
+      margin-bottom: 12px !important;
+    }
+    .settings-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #f0f9ff !important;
+      border: 2px solid #bae6fd !important;
+      border-radius: 20px !important;
+      padding: 16px 18px !important;
+      margin-bottom: 14px !important;
+      text-align: left;
+    }
+    .setting-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .setting-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0369a1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .setting-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .setting-opt-btn {
+      flex: 1;
+      min-width: 90px;
+      background: #ffffff !important;
+      border: 1.5px solid #cbd5e1 !important;
+      border-radius: 14px !important;
+      padding: 8px 12px !important;
+      font-family: inherit;
+      font-size: 13px !important;
+      font-weight: 700 !important;
+      color: #475569 !important;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      text-align: center;
+      white-space: nowrap;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+    .setting-opt-btn:hover {
+      border-color: #38bdf8 !important;
+      color: #0284c7 !important;
+      transform: translateY(-1px);
+    }
+    .setting-opt-btn.active {
+      background: linear-gradient(135deg, #0284c7, #0ea5e9) !important;
+      border-color: #0284c7 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4) !important;
+      transform: translateY(-1px) scale(1.02);
+    }
+    .setting-row-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 580px) {
+      .setting-row-2col { grid-template-columns: 1fr; }
+    }
+    .start-storage-note {
+      font-size: 12px;
+      font-weight: 700;
+      color: #065f46;
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      border-radius: 20px;
+      padding: 6px 14px;
+      margin-bottom: 14px;
+      display: inline-block;
+      text-align: center;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .btn-pulse-start {
+      background: linear-gradient(180deg, #10b981, #059669) !important;
+      font-size: 20px !important;
+      padding: 14px 42px !important;
+      border-radius: 30px !important;
+      width: 100%;
+      box-sizing: border-box;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45) !important;
+      animation: startPulse 2s infinite;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 3D WebGL 畫布容器 -->
+  <div id="game-canvas-container"></div>
+
+  <!-- 遊戲 HUD 介面層 -->
+  <div class="game-hud-layer">
+    
+    <!-- 頂部整合區塊 (頂部資訊欄 + 題目指示看板，避免被 space-between 推擠至中央) -->
+    <div class="hud-top-section">
+      <!-- 頂部資訊與控制欄 -->
+      <header class="hud-top-bar">
+        <!-- 標題、模式切換與角色選擇 -->
+        <div class="hud-title-capsule hud-interactive">
+          <div class="game-logo">
+            <span class="game-logo-icon">🐸</span>
+            <span>River Hop</span>
+          </div>
+
+          <!-- 四大教學模式 -->
+          <nav class="mode-selector">
+            <button class="mode-btn active" data-mode="LISTEN_HOP" id="btn-mode-listen">聽音跳荷葉</button>
+            <button class="mode-btn" data-mode="BEGINNING_SOUNDS" id="btn-mode-phonics">首字母尋寶</button>
+            <button class="mode-btn" data-mode="ANIMAL_ACTIONS" id="btn-mode-action">動物大本領</button>
+            <button class="mode-btn" data-mode="ENDLESS" id="btn-mode-endless">無盡過河</button>
+          </nav>
+
+          <!-- 角色更換切換盤 -->
+          <div class="character-selector" title="選擇出發的小夥伴">
+            <button class="char-btn active" data-char="frog" title="小綠蛙 Froggy">🐸</button>
+            <button class="char-btn" data-char="duck" title="小黃鴨 Ducky">🦆</button>
+            <button class="char-btn" data-char="bunny" title="小雪兔 Bunny">🐰</button>
+          </div>
+        </div>
+
+        <!-- 右側統計指標與學習輔助工具 -->
+        <div class="hud-stats-group hud-interactive">
+          <div class="stat-badge">
+            <span class="stat-label">ROUND</span>
+            <span class="stat-value" id="hud-round">1 / 10</span>
+          </div>
+          <div class="stat-badge combo-badge">
+            <span class="stat-label">COMBO</span>
+            <span class="stat-value" id="hud-combo">0x</span>
+          </div>
+          <div class="stat-badge">
+            <span class="stat-label">SCORE</span>
+            <span class="stat-value" id="hud-score">0</span>
+          </div>
+          
+          <div class="hud-tools">
+            <button class="tool-toggle-btn" id="btn-restart-game" title="重新開始本輪過河挑戰">
+              <span>🔄</span>
+              <span>重新開始</span>
+            </button>
+            <button class="tool-toggle-btn active" id="btn-hud-toggle-prompt" title="顯示或關閉上方題目提示卡（純聽力模式）">
+              <span>📋</span>
+              <span id="hud-prompt-toggle-label">提示卡: 開啟</span>
+            </button>
+            <button class="tool-toggle-btn active" id="toggle-hint" title="開啟或關閉荷葉單字文字提示">
+              <span>💡</span>
+              <span id="hint-label">荷葉單字: 開啟</span>
+            </button>
+            <button class="tool-toggle-btn active" id="toggle-bilingual" title="切換中英雙語真人發音">
+              <span>🌐</span>
+              <span id="bilingual-label">語音: 雙語</span>
+            </button>
+            <button class="tool-icon-btn" id="btn-mute" title="靜音或開啟聲音">
+              <span>🔊</span>
+            </button>
+            <button class="tool-icon-btn" id="btn-open-settings" title="自訂遊戲設定與練習偏好（自動暫存至瀏覽器）">
+              <span>⚙️</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- 緊湊型題目指示與發音看板 (支援完全關閉/收合與顯示，避免洩題) -->
+      <div class="hud-prompt-wrapper">
+        <!-- 展開狀態的完整提示看板 -->
+        <section class="hud-prompt-card hud-interactive" id="hud-prompt-card">
+          <button class="prompt-icon-btn" id="btn-speak-again" title="再聽一次題目發音">
+            <span>📢</span>
+          </button>
+          <div class="prompt-text-container">
+            <h1 class="prompt-title" id="hud-prompt-text">Listen & Hop!</h1>
+            <p class="prompt-subtitle" id="hud-prompt-sub">Tap the matching lily pad to cross the river</p>
+          </div>
+          <!-- 題目卡文字防洩題切換按鈕 -->
+          <button class="prompt-eye-btn" id="btn-toggle-prompt-text" title="顯示或隱藏答案文字">
+            <span id="prompt-eye-icon">🙈</span>
+            <span id="prompt-eye-text">隱藏答案</span>
+          </button>
+          <!-- 提示卡一鍵關閉按鈕 (關閉後進入純聽力模式) -->
+          <button class="prompt-close-btn" id="btn-close-prompt" title="關閉上方提示卡（純聽力挑戰，避免看字洩題）">
+            <span>✖ 關閉提示</span>
+          </button>
+        </section>
+
+        <!-- 提示卡收合/關閉時顯示的迷你小按鈕（點擊即可再度展開） -->
+        <div class="hud-prompt-minimized hud-interactive" id="hud-prompt-minimized" style="display: none;">
+          <button class="prompt-min-listen-btn" id="btn-min-speak" title="聽發音">
+            <span>📢 聽題目發音</span>
+          </button>
+          <button class="prompt-min-expand-btn" id="btn-expand-prompt" title="展開題目提示看板">
+            <span>💡 顯示提示卡</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部操作列：特大虛擬跳躍按鈕與操作提示 -->
+    <footer class="hud-bottom-bar">
+      <!-- 虛擬跳躍按鈕群 (幼童觸控最佳化) -->
+      <div class="hop-buttons-group hud-interactive">
+        <button class="hop-btn" id="btn-hop-left" title="跳往左側荷葉 (A / ←)">
+          <span class="hop-icon">👈</span>
+          <span class="hop-text">跳左邊</span>
+        </button>
+        <button class="hop-btn hop-btn-center" id="btn-hop-center" title="跳往前中央荷葉 (W / 空白鍵 / ↑)">
+          <span class="hop-icon">🐸</span>
+          <span class="hop-text">跳中間</span>
+        </button>
+        <button class="hop-btn" id="btn-hop-right" title="跳往右側荷葉 (D / →)">
+          <span class="hop-icon">👉</span>
+          <span class="hop-text">跳右邊</span>
+        </button>
+      </div>
+
+      <div class="control-tips hud-interactive">
+        <div><span class="kbd-badge">直接點選荷葉</span> 跳向目標</div>
+        <div><span class="kbd-badge">方向鍵 / A W D</span> 快速起跳</div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- 答對反饋快訊 -->
+  <div class="feedback-toast" id="feedback-toast">✨ Awesome!</div>
+
+  <!-- 遊戲開始與偏好設定封面彈窗 (Start Game & Settings Modal) -->
+  <div class="modal-overlay show" id="start-game-modal">
+    <div class="modal-card start-modal-card">
+      <div class="modal-header-section">
+        <div class="modal-logo-icon">🐸🌊</div>
+        <h1 class="modal-title">萌蛙過河單字大冒險</h1>
+        <p class="modal-sub">自訂您的學習練習偏好（設定將自動暫存於瀏覽器）</p>
+      </div>
+      
+      <!-- 預先設定選項面板 -->
+      <div class="settings-panel">
+        <!-- 1. 教學模式 -->
+        <div class="setting-group">
+          <label class="setting-label">🎮 學習模式 (Mode)</label>
+          <div class="setting-options" id="opt-group-mode">
+            <button class="setting-opt-btn active" data-val="LISTEN_HOP">🎧 聽音跳荷葉</button>
+            <button class="setting-opt-btn" data-val="BEGINNING_SOUNDS">🔤 首字母尋寶</button>
+            <button class="setting-opt-btn" data-val="ANIMAL_ACTIONS">🐾 動物大本領</button>
+            <button class="setting-opt-btn" data-val="ENDLESS">🌊 無盡過河</button>
+          </div>
+        </div>
+
+        <!-- 2. 出發角色 -->
+        <div class="setting-group">
+          <label class="setting-label">🐾 出發小夥伴 (Character)</label>
+          <div class="setting-options" id="opt-group-char">
+            <button class="setting-opt-btn active" data-val="frog">🐸 小綠蛙 (Froggy)</button>
+            <button class="setting-opt-btn" data-val="duck">🦆 小黃鴨 (Ducky)</button>
+            <button class="setting-opt-btn" data-val="bunny">🐰 小雪兔 (Bunny)</button>
+          </div>
+        </div>
+
+        <!-- 3. 荷葉圖卡提示與上方看板 -->
+        <div class="setting-row-2col">
+          <div class="setting-group">
+            <label class="setting-label">💡 荷葉單字標籤</label>
+            <div class="setting-options" id="opt-group-hint">
+              <button class="setting-opt-btn active" data-val="true">顯示單字 (圖+文)</button>
+              <button class="setting-opt-btn" data-val="false">隱藏單字 (純圖盲聽)</button>
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <label class="setting-label">📋 上方題目提示卡</label>
+            <div class="setting-options" id="opt-group-prompt">
+              <button class="setting-opt-btn active" data-val="true">展開顯示</button>
+              <button class="setting-opt-btn" data-val="false">預先關閉 (防洩題)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. 真人語音與關卡題數 -->
+        <div class="setting-row-2col">
+          <div class="setting-group">
+            <label class="setting-label">🌐 語音發音</label>
+            <div class="setting-options" id="opt-group-bilingual">
+              <button class="setting-opt-btn active" data-val="true">中英雙語真人發音</button>
+              <button class="setting-opt-btn" data-val="false">純英文真人發音</button>
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <label class="setting-label">🎯 每輪題數</label>
+            <div class="setting-options" id="opt-group-steps">
+              <button class="setting-opt-btn" data-val="5">5 題 (快速)</button>
+              <button class="setting-opt-btn active" data-val="10">10 題 (標準)</button>
+              <button class="setting-opt-btn" data-val="15">15 題 (挑戰)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="start-storage-note">
+        💾 以上設定已自動暫存至此瀏覽器，日後進入將以您的專屬預設進行練習！
+      </div>
+
+      <button class="btn-primary btn-pulse-start" id="btn-start-game">
+        <span>▶ 儲存設定並開始遊戲 (Start Game)</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 全輪過關結算彈窗 (Round Clear Modal) -->
+  <div class="modal-overlay" id="round-clear-modal">
+    <div class="modal-card">
+      <div class="modal-trophy">🏆</div>
+      <h2 class="modal-title">You Did It! 成功過河！</h2>
+      <p class="modal-sub">恭喜完成本輪美語學習跳島大冒險！</p>
+      
+      <div class="modal-stats">
+        <div class="modal-stat-item">
+          <span class="modal-stat-label">總得分</span>
+          <span class="modal-stat-val" id="modal-final-score">1500</span>
+        </div>
+        <div class="modal-stat-item">
+          <span class="modal-stat-label">最高連擊</span>
+          <span class="modal-stat-val" id="modal-max-combo">10x</span>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="btn-play-again">再來一輪 (Play Again)</button>
+    </div>
+  </div>
+
+  <!-- 手機直立防護：強制旋轉橫向提示遮罩 (Orientation Lock Overlay) -->
+  <div id="orientation-lock-overlay" class="orientation-lock-overlay">
+    <div class="orientation-card">
+      <div class="rotate-phone-anim">
+        <div class="phone-frame">
+          <div class="phone-screen"></div>
+          <div class="phone-notch"></div>
+        </div>
+        <div class="rotate-arrow">🔄</div>
+      </div>
+      <h2 class="orientation-title">請旋轉手機為橫向遊玩</h2>
+      <p class="orientation-en">Please rotate device to landscape</p>
+      <p class="orientation-tip">3D 沉浸式冒險需寬螢幕視野，橫向遊玩才能獲得最佳體驗！</p>
+      <button id="btn-force-landscape" class="btn-fullscreen-landscape">📐 點此進入橫向全螢幕</button>
+    </div>
+  </div>
+
+  <!-- 遊戲核心 JavaScript 模組 -->
+  <script src="js/images_data.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/models.js"></script>
+  <script src="js/river.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
