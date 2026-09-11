@@ -1,4 +1,4 @@
-{
+window.SENTENCES_AUDIO_MAP = {
   "Letter ai. Sound a. Find the word that starts with ai.": "assets/audios/sentences/frog_prompt_ai.mp3",
   "Letter ai. Sound /a/. Find the word that starts with ai.": "assets/audios/sentences/frog_prompt_ai.mp3",
   "Letter ai. Find the word that starts with ai": "assets/audios/sentences/frog_intro_ai.mp3",
@@ -21,4 +21,4 @@
   "The happy boy plays with his new colorful toy. What does the boy play with?": "assets/audios/sentences/frog_act_2a3007b9.mp3",
   "What vehicle runs on the track? Look at the silver train running on the track.": "assets/audios/sentences/frog_act_b202c337.mp3",
   "Look at the silver train running on the track. What vehicle runs on the track?": "assets/audios/sentences/frog_act_b202c337.mp3"
-}
+};
