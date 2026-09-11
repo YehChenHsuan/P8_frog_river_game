@@ -1,9 +1,10 @@
 /**
  * ALICE ESL Phonics P8 - 萌蛙過河單字大冒險題庫核心資料 (data.js)
  * 課本學習範圍：Page 08 - 13
- * 主題：Focus Sounds: Diphthongs (ai, oi, air, oy) & Body Parts
+ * 主題：Diphthongs & Body Parts
  */
 
+window.BOOK_ID = "P8";
 const P8_VOCABULARY = [
   {
     "id": "Bible",
@@ -798,62 +799,57 @@ const PHONICS_GROUPS = {
 // 課文動作問答情境題庫
 const ANIMAL_ACTION_QUESTIONS = [
   {
-    "subject": "Boy",
-    "action": "point",
-    "sentence": "Point to your nose and ears!",
-    "question": "What does the boy point to?",
+    "sentence": "Point to your nose and touch your ear!",
+    "question": "What do you point to on your face?",
+    "ttsPrompt": "Point to your nose and touch your ear! What do you point to?",
     "options": [
       "nose",
       "chair",
-      "train"
+      "coin"
     ],
     "correct": "nose"
   },
   {
-    "subject": "Girl",
-    "action": "brush",
-    "sentence": "Brush your hair in the morning.",
-    "question": "What should she brush?",
+    "sentence": "Raise your left arm and clap your hands.",
+    "question": "What do you raise?",
+    "ttsPrompt": "Raise your left arm and clap your hands. What do you raise?",
     "options": [
-      "hair",
-      "coin",
-      "tail"
+      "arm",
+      "leg",
+      "foot"
     ],
-    "correct": "hair"
+    "correct": "arm"
   },
   {
-    "subject": "Sailor",
-    "action": "sail",
-    "sentence": "The sailor can sail in the rain.",
-    "question": "What can the sailor do?",
+    "sentence": "The silver airplane can fly high in the air.",
+    "question": "What can fly high in the air?",
+    "ttsPrompt": "The silver airplane can fly high in the air. What can fly high?",
     "options": [
-      "sail",
-      "boil",
-      "destroy"
+      "airplane",
+      "train",
+      "bicycle"
     ],
-    "correct": "sail"
+    "correct": "airplane"
   },
   {
-    "subject": "Child",
-    "action": "enjoy",
-    "sentence": "Children enjoy the fun new toy.",
-    "question": "What do children enjoy?",
+    "sentence": "The happy boy plays with his new colorful toy.",
+    "question": "What does the boy play with?",
+    "ttsPrompt": "The happy boy plays with his new colorful toy. What does he play with?",
     "options": [
       "toy",
-      "stair",
-      "soil"
+      "soil",
+      "coin"
     ],
     "correct": "toy"
   },
   {
-    "subject": "Train",
-    "action": "ride",
-    "sentence": "We can ride the silver train.",
-    "question": "What can we ride?",
+    "sentence": "Look at the silver train running on the track.",
+    "question": "What vehicle runs on the track?",
+    "ttsPrompt": "Look at the silver train running on the track. What runs on the track?",
     "options": [
       "train",
-      "tail",
-      "oyster"
+      "bottle",
+      "cattle"
     ],
     "correct": "train"
   }
@@ -950,35 +946,17 @@ class QuestionGenerator {
 
   static generateEndlessQuestion(stepIndex = 1) {
     const modes = ["LISTEN_HOP", "BEGINNING_SOUNDS", "ANIMAL_ACTIONS"];
-    const mode = modes[stepIndex % modes.length];
-
-    if (mode === "BEGINNING_SOUNDS") {
-      return this.generatePhonicsQuestion();
-    } else if (mode === "ANIMAL_ACTIONS") {
-      return this.generateActionQuestion();
-    } else {
-      return this.generateListenQuestion();
-    }
+    const mode = modes[(stepIndex - 1) % modes.length];
+    if (mode === "LISTEN_HOP") return this.generateListenQuestion();
+    if (mode === "BEGINNING_SOUNDS") return this.generatePhonicsQuestion();
+    return this.generateActionQuestion();
   }
 }
 
-// 相容全域變數
 if (typeof window !== "undefined") {
   window.P1_VOCABULARY = P8_VOCABULARY;
   window.P8_VOCABULARY = P8_VOCABULARY;
   window.PHONICS_GROUPS = PHONICS_GROUPS;
   window.ANIMAL_ACTION_QUESTIONS = ANIMAL_ACTION_QUESTIONS;
-  window.VOCAB_MAP = VOCAB_MAP;
   window.QuestionGenerator = QuestionGenerator;
-}
-
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = {
-    P1_VOCABULARY: P8_VOCABULARY,
-    P8_VOCABULARY,
-    PHONICS_GROUPS,
-    ANIMAL_ACTION_QUESTIONS,
-    VOCAB_MAP,
-    QuestionGenerator
-  };
 }

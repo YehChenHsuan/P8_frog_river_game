@@ -75,8 +75,10 @@ class SoundController {
     }
     this.stopVoice();
 
-    const enPath = `P8_flashcards_audios/P1_${vocabId}.mp3`;
-    const zhPath = `P8_flashcards_audios/P1_${vocabId}_zh.mp3`;
+    const book = window.BOOK_ID || "P8";
+    const enPath = `${book}_flashcards_audios/${book}_${vocabId}.mp3`;
+    const zhPath = `${book}_flashcards_audios/${book}_${vocabId}_zh.mp3`;
+    
 
     this.voiceAudio = new Audio(enPath);
 
@@ -125,39 +127,9 @@ class SoundController {
     }
     this.stopVoice();
 
-    const audioMap = {
-      "Letter Ff. Find the word that starts with Ff": "assets/audios/sentences/phonics_intro_ff.mp3",
-      "Letter Ff. Sound f. Find the word that starts with Ff.": "assets/audios/sentences/phonics_prompt_ff.mp3",
-      "Letter Ff. Sound /f/. Find the word that starts with Ff.": "assets/audios/sentences/phonics_prompt_ff.mp3",
-      "Letter Dd. Find the word that starts with Dd": "assets/audios/sentences/phonics_intro_dd.mp3",
-      "Letter Dd. Sound d. Find the word that starts with Dd.": "assets/audios/sentences/phonics_prompt_dd.mp3",
-      "Letter Dd. Sound /d/. Find the word that starts with Dd.": "assets/audios/sentences/phonics_prompt_dd.mp3",
-      "Letter Hh. Find the word that starts with Hh": "assets/audios/sentences/phonics_intro_hh.mp3",
-      "Letter Hh. Sound h. Find the word that starts with Hh.": "assets/audios/sentences/phonics_prompt_hh.mp3",
-      "Letter Hh. Sound /h/. Find the word that starts with Hh.": "assets/audios/sentences/phonics_prompt_hh.mp3",
-      "Letter Rr. Find the word that starts with Rr": "assets/audios/sentences/phonics_intro_rr.mp3",
-      "Letter Rr. Sound r. Find the word that starts with Rr.": "assets/audios/sentences/phonics_prompt_rr.mp3",
-      "Letter Rr. Sound /r/. Find the word that starts with Rr.": "assets/audios/sentences/phonics_prompt_rr.mp3",
-      "Letter Ss. Find the word that starts with Ss": "assets/audios/sentences/phonics_intro_ss.mp3",
-      "Letter Ss. Sound s. Find the word that starts with Ss.": "assets/audios/sentences/phonics_prompt_ss.mp3",
-      "Letter Ss. Sound /s/. Find the word that starts with Ss.": "assets/audios/sentences/phonics_prompt_ss.mp3",
-      "Letter Jj. Find the word that starts with Jj": "assets/audios/sentences/phonics_intro_jj.mp3",
-      "Letter Jj. Sound j. Find the word that starts with Jj.": "assets/audios/sentences/phonics_prompt_jj.mp3",
-      "Letter Jj. Sound /j/. Find the word that starts with Jj.": "assets/audios/sentences/phonics_prompt_jj.mp3",
-      "Letter Kk. Find the word that starts with Kk": "assets/audios/sentences/phonics_intro_kk.mp3",
-      "Letter Kk. Sound k. Find the word that starts with Kk.": "assets/audios/sentences/phonics_prompt_kk.mp3",
-      "Letter Kk. Sound /k/. Find the word that starts with Kk.": "assets/audios/sentences/phonics_prompt_kk.mp3",
-      "What can the frog do? The frog can jump!": "assets/audios/sentences/action_frog_jump.mp3",
-      "What can the duck do? The duck can walk!": "assets/audios/sentences/action_duck_walk.mp3",
-      "What can the fish do? The fish can swim!": "assets/audios/sentences/action_fish_swim.mp3",
-      "What can the rabbit do? The rabbit can hop!": "assets/audios/sentences/action_rabbit_hop.mp3",
-      "What can the dog do? The dog can run!": "assets/audios/sentences/action_dog_run.mp3",
-      "What can the owl do? The owl can fly!": "assets/audios/sentences/action_owl_fly.mp3",
-      "What can you do? I can dance!": "assets/audios/sentences/action_you_dance.mp3"
-    };
-
     const clean = text.trim();
-    const audioPath = audioMap[clean];
+    const map = window.SENTENCES_AUDIO_MAP || {};
+    const audioPath = map[clean] || map[clean.replace(/,\s*/g, ' ')];
 
     if (audioPath) {
       this.voiceAudio = new Audio(audioPath);

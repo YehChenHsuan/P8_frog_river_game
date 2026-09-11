@@ -365,7 +365,7 @@ class ModelFactory {
 
     // 取得圖片來源 (Base64 或本機路徑)
     let imageSrc = vocabItem.image;
-    if (typeof P1_FLASHCARD_IMAGES !== "undefined" && P1_FLASHCARD_IMAGES[vocabItem.id]) {
+    if (false && typeof P1_FLASHCARD_IMAGES !== "undefined") {
       imageSrc = P1_FLASHCARD_IMAGES[vocabItem.id];
     }
 
