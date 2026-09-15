@@ -286,9 +286,17 @@ class ModelFactory {
       ctx.stroke();
 
       // 2. 上方插圖區塊 (480 x 480，四周留白 16px)
+      let imageDrawn = false;
       if (loadedImg && loadedImg.complete && loadedImg.naturalWidth > 0) {
-        ctx.drawImage(loadedImg, 16, 16, 480, 480);
-      } else {
+        try {
+          ctx.drawImage(loadedImg, 16, 16, 480, 480);
+          imageDrawn = true;
+        } catch (drawErr) {
+          console.warn(`繪製教材圖片失敗: ${vocabItem.word}`, drawErr);
+        }
+      }
+
+      if (!imageDrawn) {
         // 預設佔位圓形與首字母圖案
         ctx.fillStyle = "#f0f9ff";
         ctx.beginPath();
@@ -360,15 +368,23 @@ class ModelFactory {
         ctx.fillText("🎧 Listen & Choose", 256, 566);
       }
 
-      tex.needsUpdate = true;
+      try {
+        tex.needsUpdate = true;
+      } catch (texErr) {
+        console.warn(`WebGL 紋理更新安全例外: ${vocabItem.word}`, texErr);
+      }
     };
 
     // 取得圖片來源 (Base64 或本機路徑)
-    let imageSrc = vocabItem.image;
-    if (false && typeof P1_FLASHCARD_IMAGES !== "undefined") {
-      imageSrc = P1_FLASHCARD_IMAGES[vocabItem.id];
+    let imageSrc = null;
+    const bookId = window.BOOK_ID || "";
+    const bookImages = (window[`${bookId}_FLASHCARD_IMAGES`] || window.FLASHCARD_IMAGES || (typeof P1_FLASHCARD_IMAGES !== "undefined" ? P1_FLASHCARD_IMAGES : null));
+    if (bookImages) {
+      imageSrc = bookImages[vocabItem.id] || bookImages[vocabItem.word] || bookImages[vocabItem.image];
     }
-
+    if (!imageSrc) {
+      imageSrc = vocabItem.image;
+    }
     if (imageSrc) {
       if (this.imageElementCache[vocabItem.id]) {
         // 快取已存在
@@ -475,7 +491,7 @@ class ModelFactory {
     const cardTex = this.createFlashcardTexture(vocabItem, showText);
     const cardMat = new THREE.MeshBasicMaterial({
       map: cardTex,
-      side: THREE.FrontSide
+      side: THREE.DoubleSide
     });
     const cardGeo = new THREE.PlaneGeometry(cardW, cardH);
     // 旋轉幾何體以正面朝向攝影機，並給予仰角迎接上方攝影機俯視
@@ -485,15 +501,7 @@ class ModelFactory {
     cardMesh.position.set(0, 0, 0);
     cardStandGroup.add(cardMesh);
 
-    // (B) 背面純白防透背板 (位於後方 +Z 方向，較遠離攝影機)
-    const backGeo = new THREE.PlaneGeometry(cardW, cardH);
-    backGeo.rotateX(-0.18);
-    const backMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc, side: THREE.FrontSide });
-    const backMesh = new THREE.Mesh(backGeo, backMat);
-    backMesh.position.set(0, 0, 0.04);
-    cardMesh.renderOrder = 2;
-    backMesh.renderOrder = 1;
-    cardStandGroup.add(backMesh);
+    // (B) 正面卡牌已具備完全不透明之高清晰材質（雙面呈現，無任何多餘背板遮蔽）
 
     // (C) 低矮晶石基座 (貼合荷葉表面，高度僅 0.12，絕不阻擋後方視線)
     const baseGeo = new THREE.CylinderGeometry(0.38, 0.45, 0.12, 16);
